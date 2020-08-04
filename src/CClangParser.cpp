@@ -6,58 +6,94 @@ clang++ ex3.cpp $(llvm-config-10 --cxxflags) $(llvm-config-10 --ldflags --libs -
 
 */
 
+#include <map>
 #include <clang-c/Index.h>
 #include <iostream>
+#include <filesystem>
+#include "CClangParser.h"
+#include "CClangUtil.h"
 
-int count = 0;
+using gintel::modules::CClangParser;
+using gintel::modules::CClangUtil;
 
-CXChildVisitResult visitor(CXCursor cursor, CXCursor, CXClientData)
+struct VisitorContext
 {
+	std::function<bool(const CClangParser::ObjectInfo&, void*)> callback;
+	void* callbackCtx;
+};
+
+std::string obTypeName(CClangParser::ObjectType type)
+{
+	switch (type)
+	{
+		case CClangParser::ObjectType::Method:
+			return "[Method]";
+
+		case CClangParser::ObjectType::Class:
+			return "[Class]";
+
+		case CClangParser::ObjectType::GlobalFunction:
+			return "[Function]";
+	}
+
+	return "[]";
+}
+
+CXChildVisitResult visitor(
+	CXCursor cursor,
+	CXCursor parent,
+	CXClientData context
+	)
+{
+	auto visitorCtx {reinterpret_cast<VisitorContext*>(context)};
+
 	auto isMainFile = clang_Location_isFromMainFile(clang_getCursorLocation(cursor));
 	if (!isMainFile)
 	{
 		return CXChildVisit_Continue;
 	}
 
-	// Consider functions and methods
-	CXCursorKind kind = clang_getCursorKind(cursor);
-	if (kind == CXCursorKind::CXCursor_FunctionDecl ||
-		kind == CXCursorKind::CXCursor_CXXMethod)
+	//	cursor kind mapping
+	std::map<CXCursorKind, CClangParser::ObjectType> cursorKindMap;
+	cursorKindMap[CXCursorKind::CXCursor_FunctionDecl] = CClangParser::ObjectType::GlobalFunction;
+	cursorKindMap[CXCursorKind::CXCursor_ClassDecl] = CClangParser::ObjectType::Class;
+	cursorKindMap[CXCursorKind::CXCursor_CXXMethod] = CClangParser::ObjectType::Method;
+
+	CXCursorKind kind {clang_getCursorKind(cursor)};
+
+	//	Object info generation
+	auto prepareObject {[&](CXCursor cur, CClangParser::ObjectInfo& obInfo) {
+		obInfo.type = cursorKindMap[kind];
+		obInfo.name = CClangUtil::getCursorName(cur);
+		obInfo.location.file = CClangUtil::getCursorFileLocation(cur);
+	}};
+
+	//	Only indicate objects of interest to the caller
+	if (cursorKindMap.find(kind) != cursorKindMap.end())
 	{
-		auto cursorName = clang_getCursorDisplayName(cursor);
+		CClangParser::ObjectInfo obInfo;
+		prepareObject(cursor, obInfo);
 
-		// Print if function/method starts with doSomething
-		auto cursorNameStr = std::string(clang_getCString(cursorName));
-		if (cursorNameStr.find("doSomething") == 0)
+		//	indicate this object to the caller
+		auto callbackRet {visitorCtx->callback(obInfo, visitorCtx->callbackCtx)};
+		if (!callbackRet)
 		{
-			// Get the source locatino
-			CXSourceRange range = clang_getCursorExtent(cursor);
-			CXSourceLocation location = clang_getRangeStart(range);
-
-			CXFile file;
-			unsigned line;
-			unsigned column;
-			clang_getFileLocation(location, &file, &line, &column, nullptr);
-
-			auto fileName = clang_getFileName(file);
-
-			std::cout << "Found call to " << clang_getCString(cursorName) << " at "
-				<< line << ":" << column << " in " << clang_getCString(fileName)
-				<< std::endl;
-
-			clang_disposeString(fileName);
+			return CXChildVisit_Break;
 		}
-
-		clang_disposeString(cursorName);
 	}
 
 	return CXChildVisit_Recurse;
 }
 
-void processSourceFile(const std::filesystem::path& filePath)
+void CClangParser::parseSourceFile(
+	const std::filesystem::path& filePath,
+	std::function<bool(const CClangParser::ObjectInfo&, void*)> callback,
+	void* context
+	)
 {
 	// Command line arguments required for parsing the TU
-	constexpr const char *ARGUMENTS[] = {};
+	//constexpr const char *ARGUMENTS[] = {"-fms-compatibility", "-fsyntax-only", "--", "-x", "c++"};
+	constexpr const char *ARGUMENTS[] = {"-x", "c++"};
 
 	// Create an index with excludeDeclsFromPCH = 1, displayDiagnostics = 0
 	CXIndex index = clang_createIndex(1, 0);
@@ -65,15 +101,23 @@ void processSourceFile(const std::filesystem::path& filePath)
 	// Speed up parsing by skipping function bodies
 	CXTranslationUnit translationUnit = clang_parseTranslationUnit(
 			index, filePath.string().c_str(), ARGUMENTS, std::extent<decltype(ARGUMENTS)>::value,
-			nullptr, 0, CXTranslationUnit_SkipFunctionBodies);
+			nullptr, 0, CXTranslationUnit_SkipFunctionBodies | CXTranslationUnit_KeepGoing | 
+			CXTranslationUnit_LimitSkipFunctionBodiesToPreamble | CXTranslationUnit_IgnoreNonErrorsFromIncludedFiles);
 
 	// Visit all the nodes in the AST
 	CXCursor cursor = clang_getTranslationUnitCursor(translationUnit);
-	clang_visitChildren(cursor, visitor, 0);
+
+	VisitorContext clientData;
+	clientData.callback = callback;
+	clientData.callbackCtx = context;
+
+	clang_visitChildren(
+		cursor,
+		visitor,
+		&clientData);
 
 	// Release memory
 	clang_disposeTranslationUnit(translationUnit);
 	clang_disposeIndex(index);
-
-	std::cout << "Count = " << count << std::endl;
 }
+

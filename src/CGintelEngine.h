@@ -1,5 +1,8 @@
 
 #include <filesystem>
+#include <vector>
+#include <string>
+#include <map>
 
 namespace gintel
 {
@@ -15,6 +18,7 @@ namespace gintel
 		{
 			public:
 				void addProject(const ProjectItem& project);
+				void start();
 				
 			public:
 				CGintelEngine() = default;
@@ -26,6 +30,10 @@ namespace gintel
 				void processProject(
 					const ProjectItem& project
 					);
+
+			private:
+				static std::vector<std::string> SOURCE_FILE_EXTENSIONS;
+				std::map<std::string, ProjectItem> m_projectsList;
 		};
 	}
 }

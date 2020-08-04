@@ -2,6 +2,10 @@
 #define _CFSITERATOR_H_
 
 #include <filesystem>
+#include <functional>
+#include <unordered_set>
+#include <vector>
+#include <string>
 
 namespace gintel
 {

@@ -27,7 +27,8 @@ CXChildVisitResult visitor(CXCursor cursor, CXCursor, CXClientData) {
 
 		// Print if function/method starts with doSomething
 		auto cursorNameStr = std::string(clang_getCString(cursorName));
-		if (cursorNameStr.find("doSomething") == 0) {
+		// if (cursorNameStr.find("doSomething") == 0) {
+		if (true) {
 			// Get the source locatino
 			CXSourceRange range = clang_getCursorExtent(cursor);
 			CXSourceLocation location = clang_getRangeStart(range);

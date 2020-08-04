@@ -1,5 +1,6 @@
 
 #include <algorithm>
+#include <vector>
 #include <unordered_set>
 #include <string>
 #include <filesystem>
@@ -39,7 +40,7 @@ void CSourceEnumerator::addEnumerableFileExtensions(
 	std::vector<std::string>& extensions
 	)
 {
-	std::for_each(const auto& e: extensions)
+	for (const auto& e: extensions)
 	{
 		m_enumerableExtensions.emplace(e);
 	}

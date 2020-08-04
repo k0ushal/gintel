@@ -5,6 +5,7 @@ clang++ ex3.cpp $(llvm-config-10 --cxxflags) $(llvm-config-10 --ldflags --libs -
 
 */
 
+#if 0
 #include <clang-c/Index.h>
 
 #include <iostream>
@@ -81,3 +82,19 @@ int main(int argc, char **argv) {
 
 	return 0;
 }
+#endif
+
+#include "CGintelEngine.h"
+
+using gintel::modules::CGintelEngine;
+using gintel::modules::ProjectItem;
+
+int main()
+{
+	CGintelEngine engine;
+
+	engine.addProject(ProjectItem{"Shape", "/home/koushal/projects/gintel/target_sources/shape"});
+	engine.start();
+	return 0;
+}
+
