@@ -1,14 +1,19 @@
 
+#ifndef _CGINTELENGINE_H_
+#define _CGINTELENGINE_H_
+
+
 #include <filesystem>
 #include <vector>
 #include <string>
 #include <map>
+#include "CClangParser.h"
 
 namespace gintel
 {
 	namespace modules
 	{
-		struct ProjectItem
+		struct SourceProject
 		{
 			std::string projectName;
 			std::filesystem::path srcDirPath;
@@ -17,8 +22,14 @@ namespace gintel
 		class CGintelEngine
 		{
 			public:
-				void addProject(const ProjectItem& project);
-				void start();
+				void addProject(const SourceProject& project);
+				void rebuildSymbolsDB();
+
+			private:
+				void processProject(const SourceProject& project);
+				void addSymbolToDB(
+					const CClangParser::ObjectInfo& objInfo,
+					const SourceProject& project);
 				
 			public:
 				CGintelEngine() = default;
@@ -27,15 +38,11 @@ namespace gintel
 				CGintelEngine& operator =(const CGintelEngine&) = delete;
 
 			private:
-				void processProject(
-					const ProjectItem& project
-					);
-
-			private:
 				static std::vector<std::string> SOURCE_FILE_EXTENSIONS;
-				std::map<std::string, ProjectItem> m_projectsList;
+				std::map<std::string, SourceProject> m_projectsList;
 		};
 	}
 }
 
+#endif	//	_CGINTELENGINE_H_
 

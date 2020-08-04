@@ -1,6 +1,6 @@
 #include "shape.h"
 
-int HelperFunc(int, char)
+int HelperFunc(int id, char choice)
 {
 }
 

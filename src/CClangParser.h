@@ -1,4 +1,7 @@
 
+#ifndef _CCLANGPARSER_H_
+#define _CCLANGPARSER_H_
+
 #include <filesystem>
 #include <functional>
 
@@ -38,3 +41,4 @@ namespace gintel
 	}
 }
 
+#endif	//	_CCLANGPARSER_H_
