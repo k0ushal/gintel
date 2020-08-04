@@ -1,0 +1,2 @@
+https://stackoverflow.com/questions/19413156/clang-cant-parse-my-h-file-standalone
+
