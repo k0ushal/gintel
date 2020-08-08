@@ -13,11 +13,19 @@ add_executable(gintel
 	src/CClangUtil.cpp
 	)
 
-target_include_directories(gintel PUBLIC "/usr/lib/llvm-10/include")
+execute_process(COMMAND llvm-config --includedir OUTPUT_VARIABLE INCLUDE_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND llvm-config --libdir OUTPUT_VARIABLE LIBRARIES_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-find_library(CLANG_LIB clang HINTS "/usr/lib/llvm-10/lib") 
+target_include_directories(gintel PUBLIC ${INCLUDE_DIR})
 
-target_link_libraries(gintel
-		PRIVATE
-		${CLANG_LIB}
-		)
+find_library(
+	CLANG_LIB
+	NAME clang
+	PATHS ${LIBRARIES_DIR}
+	)
+
+target_link_libraries(
+	gintel
+	PUBLIC
+	${CLANG_LIB}
+	)
