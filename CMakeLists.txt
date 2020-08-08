@@ -1,31 +1,25 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(gintel)
+set(CMAKE_PROJECT_NAME gintel)
+project(${CMAKE_PROJECT_NAME})
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(ADDITIONAL_INCLUDE_DIR "/usr/local/include")
+set(ADDITIONAL_LIBRARY_DIR "/usr/local/lib")
+set(PROJECT_BUILD_DIR "${CMAKE_BINARY_DIR}/build")
 
-add_executable(gintel
-    src/main.cpp
-	src/CClangParser.cpp
-	src/CGintelEngine.cpp
-	src/CSourceEnumerator.cpp
-	src/CClangUtil.cpp
-	)
+add_custom_target(build-time-make-directory ALL
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BUILD_DIR})
 
-execute_process(COMMAND llvm-config --includedir OUTPUT_VARIABLE INCLUDE_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND llvm-config --libdir OUTPUT_VARIABLE LIBRARIES_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BUILD_DIR})	#	binary path
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BUILD_DIR})	#	.so path
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BUILD_DIR})	#	.a path
 
-target_include_directories(gintel PUBLIC ${INCLUDE_DIR})
+execute_process(COMMAND llvm-config --libdir OUTPUT_VARIABLE LLVM_LIB_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND llvm-config --includedir OUTPUT_VARIABLE LLVM_INCLUDE_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-find_library(
-	CLANG_LIB
-	NAME clang
-	PATHS ${LIBRARIES_DIR}
-	)
+include_directories(src ${ADDITIONAL_INCLUDE_DIR} ${LLVM_INCLUDE_DIR})
+link_directories(${ADDITIONAL_LIBRARY_DIR} ${LLVM_LIB_DIR})
 
-target_link_libraries(
-	gintel
-	PUBLIC
-	${CLANG_LIB}
-	)
+add_subdirectory(src)
+add_subdirectory(tests)
