@@ -11,6 +11,7 @@ add_executable(gintel
 	src/CGintelEngine.cpp
 	src/CSourceEnumerator.cpp
 	src/CClangUtil.cpp
+	src/CObjectStore.cpp
 	)
 
 target_include_directories(gintel PUBLIC "/usr/lib/llvm-10/include")

@@ -4,6 +4,9 @@
 
 #include <filesystem>
 #include <functional>
+#include <string>
+#include <memory>
+#include "IStoreObject.h"
 
 namespace gintel
 {
@@ -24,17 +27,37 @@ namespace gintel
 					std::filesystem::path file;
 				};
 
-				struct ObjectInfo
+				class CObjectInfo : public gintel::storage::IStoreObject
 				{
-					ObjectType type;
-					std::string name;
-					ObjectLocationInfo location;
+					public:
+						CObjectInfo() = default;
+						virtual ~CObjectInfo() = default;
+
+						virtual std::shared_ptr<gintel::storage::IStoreObject> clone() override
+						{
+							auto obCopy {std::make_shared<CObjectInfo>()};
+							obCopy->m_name = this->m_name;
+							obCopy->m_type = this->m_type;
+							obCopy->m_location = this->m_location;
+
+							return obCopy;
+						}
+
+						virtual std::string name() override
+						{
+							return m_name;
+						}
+
+					public:
+						std::string m_name;
+						ObjectType m_type;
+						ObjectLocationInfo m_location;
 				};
 
 			public:
 				void parseSourceFile(
 					const std::filesystem::path& filePath,
-					std::function<bool(const CClangParser::ObjectInfo&, void*)> callback,
+					std::function<bool(const CClangParser::CObjectInfo&, void*)> callback,
 					void* context
 					);
 		};

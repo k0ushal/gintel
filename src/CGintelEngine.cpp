@@ -24,7 +24,7 @@ void CGintelEngine::processProject(
 	enumerator.addEnumerableFileExtensions(SOURCE_FILE_EXTENSIONS);
 
 	//	processing logic for each symbol found
-	auto symbolsProcessor = [this](const CClangParser::ObjectInfo& objInfo, void* context) -> bool {
+	auto symbolsProcessor = [this](const CClangParser::CObjectInfo& objInfo, void* context) -> bool {
 		auto prj {reinterpret_cast<SourceProject*>(context)};
 		addSymbolToDB(objInfo, *prj);
 		return true;
@@ -53,7 +53,7 @@ void CGintelEngine::rebuildSymbolsDB()
 }
 
 void CGintelEngine::addSymbolToDB(
-	const CClangParser::ObjectInfo& objInfo,
+	const CClangParser::CObjectInfo& objInfo,
 	const SourceProject& project)
 {
 #if !DEBUG_LOGS
@@ -62,7 +62,7 @@ void CGintelEngine::addSymbolToDB(
 	obTypeMap[CClangParser::ObjectType::GlobalFunction] = "Function";
 	obTypeMap[CClangParser::ObjectType::Method] = "Method";
 
-	std::cout << "\t" << project.projectName << ":: [" << obTypeMap[objInfo.type] << "] " << objInfo.name << ", " << objInfo.location.file.filename() << std::endl;
+	std::cout << "\t" << project.projectName << ":: [" << obTypeMap[objInfo.m_type] << "] " << objInfo.m_name << ", " << objInfo.m_location.file.filename() << std::endl;
 #endif
 }
 

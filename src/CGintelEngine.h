@@ -2,7 +2,6 @@
 #ifndef _CGINTELENGINE_H_
 #define _CGINTELENGINE_H_
 
-
 #include <filesystem>
 #include <vector>
 #include <string>
@@ -28,7 +27,7 @@ namespace gintel
 			private:
 				void processProject(const SourceProject& project);
 				void addSymbolToDB(
-					const CClangParser::ObjectInfo& objInfo,
+					const CClangParser::CObjectInfo& objInfo,
 					const SourceProject& project);
 				
 			public:
