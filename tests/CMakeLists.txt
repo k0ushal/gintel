@@ -1,4 +1,4 @@
-set(BINARY ${CMAKE_PROJECT_NAME}_tst)
+set(BINARY ${CMAKE_PROJECT_NAME}_test)
 
 set(SOURCES
     testmain.cpp
