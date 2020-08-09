@@ -3,6 +3,7 @@
 #include <iostream>
 #include <functional>
 #include <filesystem>
+#include <algorithm>
 #include "CGintelEngine.h"
 #include "CSourceEnumerator.h"
 #include "CClangParser.h"

@@ -6,6 +6,7 @@ clang++ ex3.cpp $(llvm-config-10 --cxxflags) $(llvm-config-10 --ldflags --libs -
 */
 
 #include <iostream>
+#include <algorithm>
 #include "CGintelEngine.h"
 #include "CClangParser.h"
 

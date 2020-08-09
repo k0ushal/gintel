@@ -2,6 +2,7 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include <algorithm>
 #include "IStoreObject.h"
 #include "CClangSymbolsInMemoryDB.h"
 #include "CObjectIndex.h"
