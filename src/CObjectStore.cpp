@@ -7,7 +7,6 @@
 using gintel::storage::CObjectStore;
 using gintel::storage::IStoreObject;
 
-
 std::any CObjectStore::add(std::shared_ptr<IStoreObject> object)
 {
 	auto obCopy {object->clone()};
@@ -17,6 +16,7 @@ std::any CObjectStore::add(std::shared_ptr<IStoreObject> object)
 
 void CObjectStore::remove(std::any objectId)
 {
+	throw std::bad_function_call();
 }
 
 std::shared_ptr<IStoreObject> CObjectStore::get(std::any objectId)

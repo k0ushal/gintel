@@ -46,8 +46,7 @@ CXChildVisitResult visitor(
 	CXCursorKind kind {clang_getCursorKind(cursor)};
 
 	//	Object info generation
-	auto prepareObject {[&](CXCursor cur, CXCursor parent, std::shared_ptr<CClangParser::CObjectInfo> obInfo) {
-		obInfo->m_type = cursorKindMap[kind];
+	auto prepareObject {[&](CXCursor cur, CXCursor parent) -> std::shared_ptr<CClangParser::CObjectInfo> {
 
 		std::string curName;
 		if (kind == CXCursorKind::CXCursor_CXXMethod)
@@ -55,16 +54,16 @@ CXChildVisitResult visitor(
 			curName = CClangUtil::getCursorName(parent) + "::";
 		}
 		curName += CClangUtil::getCursorName(cur);
-		obInfo->m_name = curName;
+		auto curKind {cursorKindMap[kind]};
+		auto filePath {CClangUtil::getCursorFileLocation(cur)};
 
-		obInfo->m_location.file = CClangUtil::getCursorFileLocation(cur);
+		return std::make_shared<CClangParser::CObjectInfo>(curName, curKind, filePath);
 	}};
 
 	//	Only indicate objects of interest to the caller
 	if (cursorKindMap.find(kind) != cursorKindMap.end())
 	{
-		auto obInfo{std::make_shared<CClangParser::CObjectInfo>()};
-		prepareObject(cursor, parent, obInfo);
+		auto obInfo {prepareObject(cursor, parent)};
 
 		//	indicate this object to the caller
 		auto callbackRet {visitorCtx->callback(obInfo, visitorCtx->callbackCtx)};
