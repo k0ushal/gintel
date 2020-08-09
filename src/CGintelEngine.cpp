@@ -24,7 +24,7 @@ void CGintelEngine::processProject(
 	enumerator.addEnumerableFileExtensions(SOURCE_FILE_EXTENSIONS);
 
 	//	processing logic for each symbol found
-	auto symbolsProcessor = [this](const CClangParser::ObjectInfo& objInfo, void* context) -> bool {
+	auto symbolsProcessor = [this](std::shared_ptr<CClangParser::CObjectInfo> objInfo, void* context) -> bool {
 		auto prj {reinterpret_cast<SourceProject*>(context)};
 		addSymbolToDB(objInfo, *prj);
 		return true;
@@ -53,16 +53,32 @@ void CGintelEngine::rebuildSymbolsDB()
 }
 
 void CGintelEngine::addSymbolToDB(
-	const CClangParser::ObjectInfo& objInfo,
+	std::shared_ptr<CClangParser::CObjectInfo> objInfo,
 	const SourceProject& project)
 {
-#if !DEBUG_LOGS
+#if DEBUG_LOGS
 	std::map<CClangParser::ObjectType, std::string> obTypeMap;
 	obTypeMap[CClangParser::ObjectType::Class] = "Class";
 	obTypeMap[CClangParser::ObjectType::GlobalFunction] = "Function";
 	obTypeMap[CClangParser::ObjectType::Method] = "Method";
 
-	std::cout << "\t" << project.projectName << ":: [" << obTypeMap[objInfo.type] << "] " << objInfo.name << ", " << objInfo.location.file.filename() << std::endl;
+	std::cout << "\t" << project.projectName << ":: [" << obTypeMap[objInfo->m_type] << "] " << objInfo->m_name << ", " << objInfo->m_location.file.filename() << std::endl;
 #endif
+
+	m_symbolsDB.add(objInfo);
 }
 
+std::vector<std::shared_ptr<CClangParser::CObjectInfo>>
+CGintelEngine::searchSymbol(
+	const std::string& keyword)
+{
+	std::vector<std::shared_ptr<CClangParser::CObjectInfo>> result;
+
+	auto temp {m_symbolsDB.search(keyword)};
+	std::for_each(temp.begin(), temp.end(), [&](const auto object) {
+
+		result.push_back(std::dynamic_pointer_cast<CClangParser::CObjectInfo>(object));
+	});
+
+	return result;
+}

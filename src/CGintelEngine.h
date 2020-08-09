@@ -2,12 +2,12 @@
 #ifndef _CGINTELENGINE_H_
 #define _CGINTELENGINE_H_
 
-
 #include <filesystem>
 #include <vector>
 #include <string>
 #include <map>
 #include "CClangParser.h"
+#include "CClangSymbolsInMemoryDB.h"
 
 namespace gintel
 {
@@ -24,11 +24,13 @@ namespace gintel
 			public:
 				void addProject(const SourceProject& project);
 				void rebuildSymbolsDB();
+				std::vector<std::shared_ptr<CClangParser::CObjectInfo>> searchSymbol(
+					const std::string& keyword);
 
 			private:
 				void processProject(const SourceProject& project);
 				void addSymbolToDB(
-					const CClangParser::ObjectInfo& objInfo,
+					std::shared_ptr<CClangParser::CObjectInfo> objInfo,
 					const SourceProject& project);
 				
 			public:
@@ -40,6 +42,7 @@ namespace gintel
 			private:
 				static std::vector<std::string> SOURCE_FILE_EXTENSIONS;
 				std::map<std::string, SourceProject> m_projectsList;
+				gintel::storage::CClangSymbolsInMemoryDB m_symbolsDB;
 		};
 	}
 }

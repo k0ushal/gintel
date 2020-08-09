@@ -15,29 +15,13 @@ clang++ ex3.cpp $(llvm-config-10 --cxxflags) $(llvm-config-10 --ldflags --libs -
 
 using gintel::modules::CClangParser;
 using gintel::modules::CClangUtil;
+using gintel::storage::IStoreObject;
 
 struct VisitorContext
 {
-	std::function<bool(const CClangParser::ObjectInfo&, void*)> callback;
+	std::function<bool(std::shared_ptr<CClangParser::CObjectInfo>, void*)> callback;
 	void* callbackCtx;
 };
-
-std::string obTypeName(CClangParser::ObjectType type)
-{
-	switch (type)
-	{
-		case CClangParser::ObjectType::Method:
-			return "[Method]";
-
-		case CClangParser::ObjectType::Class:
-			return "[Class]";
-
-		case CClangParser::ObjectType::GlobalFunction:
-			return "[Function]";
-	}
-
-	return "[]";
-}
 
 CXChildVisitResult visitor(
 	CXCursor cursor,
@@ -62,8 +46,8 @@ CXChildVisitResult visitor(
 	CXCursorKind kind {clang_getCursorKind(cursor)};
 
 	//	Object info generation
-	auto prepareObject {[&](CXCursor cur, CXCursor parent, CClangParser::ObjectInfo& obInfo) {
-		obInfo.type = cursorKindMap[kind];
+	auto prepareObject {[&](CXCursor cur, CXCursor parent, std::shared_ptr<CClangParser::CObjectInfo> obInfo) {
+		obInfo->m_type = cursorKindMap[kind];
 
 		std::string curName;
 		if (kind == CXCursorKind::CXCursor_CXXMethod)
@@ -71,15 +55,15 @@ CXChildVisitResult visitor(
 			curName = CClangUtil::getCursorName(parent) + "::";
 		}
 		curName += CClangUtil::getCursorName(cur);
-		obInfo.name = curName;
+		obInfo->m_name = curName;
 
-		obInfo.location.file = CClangUtil::getCursorFileLocation(cur);
+		obInfo->m_location.file = CClangUtil::getCursorFileLocation(cur);
 	}};
 
 	//	Only indicate objects of interest to the caller
 	if (cursorKindMap.find(kind) != cursorKindMap.end())
 	{
-		CClangParser::ObjectInfo obInfo;
+		auto obInfo{std::make_shared<CClangParser::CObjectInfo>()};
 		prepareObject(cursor, parent, obInfo);
 
 		//	indicate this object to the caller
@@ -95,7 +79,7 @@ CXChildVisitResult visitor(
 
 void CClangParser::parseSourceFile(
 	const std::filesystem::path& filePath,
-	std::function<bool(const CClangParser::ObjectInfo&, void*)> callback,
+	std::function<bool(std::shared_ptr<CClangParser::CObjectInfo>, void*)> callback,
 	void* context
 	)
 {

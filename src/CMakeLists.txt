@@ -10,7 +10,10 @@ set(SOURCES
 	CClangParser.cpp
 	CGintelEngine.cpp
 	CSourceEnumerator.cpp
-	CClangUtil.cpp)
+	CClangUtil.cpp
+	CObjectStore.cpp
+	CClangSymbolsInMemoryDB.cpp
+	CObjectIndex.cpp)
 
 add_executable(${BINARY} ${SOURCES})
 add_library(${BINARY}_lib STATIC ${SOURCES})
