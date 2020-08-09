@@ -2,7 +2,6 @@ set(BINARY ${CMAKE_PROJECT_NAME}_test)
 
 set(SOURCES
     testmain.cpp
-    DummyTest.cpp
     CObjectStore_UnitTest.cpp
     CObjectIndex_UnitTest.cpp
 )
