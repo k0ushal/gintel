@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 #include <memory>
-#include "IStoreObject.h"
+#include "CClangParser.h"
 #include "CObjectStore.h"
 #include "CObjectIndex.h"
 
@@ -17,8 +17,8 @@ namespace gintel
 		{
 			public:
 				void add(std::shared_ptr<IStoreObject> symbol);
-				std::vector<std::shared_ptr<IStoreObject>> search(const std::string& keyword);
-				std::vector<std::shared_ptr<IStoreObject>> typeAheadSuggestions(const std::string& keyword);
+				std::vector<std::shared_ptr<gintel::modules::CClangParser::CObjectInfo>> search(const std::string& keyword);
+				std::vector<std::shared_ptr<gintel::modules::CClangParser::CObjectInfo>> typeAheadSuggestions(const std::string& keyword);
 
 			private:
 				CObjectStore m_store;

@@ -3,12 +3,12 @@
 #include <vector>
 #include <string>
 #include <algorithm>
-#include "IStoreObject.h"
+#include "CClangParser.h"
 #include "CClangSymbolsInMemoryDB.h"
 #include "CObjectIndex.h"
 
 using gintel::storage::CClangSymbolsInMemoryDB;
-using gintel::storage::IStoreObject;
+using gintel::modules::CClangParser;
 
 void CClangSymbolsInMemoryDB::add(std::shared_ptr<IStoreObject> symbol)
 {
@@ -22,38 +22,38 @@ void CClangSymbolsInMemoryDB::add(std::shared_ptr<IStoreObject> symbol)
 	m_index.add(symbol->name(), objectId);
 }
 
-std::vector<std::shared_ptr<IStoreObject>> CClangSymbolsInMemoryDB::typeAheadSuggestions(
+std::vector<std::shared_ptr<CClangParser::CObjectInfo>> CClangSymbolsInMemoryDB::typeAheadSuggestions(
 	const std::string& keyword)
 {
 	auto resultIds {m_index.typeAheadSuggestions(keyword)};
 
-	std::vector<std::shared_ptr<IStoreObject>> result;
+	std::vector<std::shared_ptr<CClangParser::CObjectInfo>> result;
 	result.reserve(resultIds.size());
 
 	std::for_each(resultIds.begin(), resultIds.end(), [&](const auto& resultId) {
 		auto storeObject {m_store.get(resultId)};
 		if (storeObject.use_count() > 0)
 		{
-			result.push_back(storeObject);
+			result.push_back(std::dynamic_pointer_cast<CClangParser::CObjectInfo>(storeObject));
 		}
 	});
 
 	return result;
 }
 
-std::vector<std::shared_ptr<IStoreObject>> CClangSymbolsInMemoryDB::search(
+std::vector<std::shared_ptr<CClangParser::CObjectInfo>> CClangSymbolsInMemoryDB::search(
 	const std::string& keyword)
 {
 	auto resultIds {m_index.search(keyword)};
 
-	std::vector<std::shared_ptr<IStoreObject>> result;
+	std::vector<std::shared_ptr<CClangParser::CObjectInfo>> result;
 	result.reserve(resultIds.size());
 
 	std::for_each(resultIds.begin(), resultIds.end(), [&](const auto& resultId) {
 		auto storeObject {m_store.get(resultId)};
 		if (storeObject.use_count() > 0)
 		{
-			result.push_back(storeObject);
+			result.push_back(std::dynamic_pointer_cast<CClangParser::CObjectInfo>(storeObject));
 		}
 	});
 
