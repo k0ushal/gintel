@@ -8,6 +8,11 @@ using gintel::storage::CObjectIndex;
 
 void CObjectIndex::add(const std::string& key, std::any value)
 {
+    if (key.empty())
+    {
+        throw std::invalid_argument("Empty key");
+    }
+    
     auto result{m_index.emplace(key, std::vector<std::any>{})};
     result.first->second.push_back(value);
 }

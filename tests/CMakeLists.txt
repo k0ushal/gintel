@@ -4,6 +4,7 @@ set(SOURCES
     testmain.cpp
     CObjectStore_UnitTest.cpp
     CObjectIndex_UnitTest.cpp
+    CClangSymbolsInMemoryDB_UnitTest.cpp
 )
 
 add_executable(${BINARY} ${SOURCES})

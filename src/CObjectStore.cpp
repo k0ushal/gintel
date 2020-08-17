@@ -9,6 +9,11 @@ using gintel::storage::IStoreObject;
 
 std::any CObjectStore::add(std::shared_ptr<IStoreObject> object)
 {
+	if (!object.use_count())
+	{
+		throw std::invalid_argument("NULL argument");
+	}
+	
 	auto obCopy {object->clone()};
 	auto itr = m_store.emplace(m_store.end(), obCopy);
 	return itr;

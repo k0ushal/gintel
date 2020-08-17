@@ -26,6 +26,12 @@ std::vector<std::shared_ptr<CClangParser::CObjectInfo>> addDummyObjectStoreEntri
     return result;
 }
 
+TEST(CObjectStore_UnitTest, Input_Validations)
+{
+    CObjectStore store;
+    ASSERT_THROW(store.add(std::shared_ptr<IStoreObject>()), std::invalid_argument);
+}
+
 TEST(CObjectStore_UnitTest, Basic_Add_and_Fetch_Test)
 {
     std::vector<std::any> objectIds;

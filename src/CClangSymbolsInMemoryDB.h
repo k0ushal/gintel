@@ -16,7 +16,7 @@ namespace gintel
 		class CClangSymbolsInMemoryDB
 		{
 			public:
-				void add(std::shared_ptr<IStoreObject> symbol);
+				void add(std::shared_ptr<gintel::modules::CClangParser::CObjectInfo> symbol);
 				std::vector<std::shared_ptr<gintel::modules::CClangParser::CObjectInfo>> search(const std::string& keyword);
 				std::vector<std::shared_ptr<gintel::modules::CClangParser::CObjectInfo>> typeAheadSuggestions(const std::string& keyword);
 

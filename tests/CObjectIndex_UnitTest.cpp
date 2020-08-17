@@ -5,6 +5,14 @@
 
 using gintel::storage::CObjectIndex;
 
+TEST(CObjectIndex_UnitTest, Input_Validations)
+{
+    CObjectIndex index;
+    ASSERT_THROW(index.add("", "empty key"), std::invalid_argument);
+    ASSERT_THROW(index.add("", 200), std::invalid_argument);
+    ASSERT_THROW(index.add("", 4.5), std::invalid_argument);
+}
+
 TEST(CObjectIndex_UnitTest, Basic_Add_and_Fetch_Test)
 {
     int value {2};

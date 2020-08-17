@@ -10,8 +10,13 @@
 using gintel::storage::CClangSymbolsInMemoryDB;
 using gintel::modules::CClangParser;
 
-void CClangSymbolsInMemoryDB::add(std::shared_ptr<IStoreObject> symbol)
+void CClangSymbolsInMemoryDB::add(std::shared_ptr<CClangParser::CObjectInfo> symbol)
 {
+	if (!symbol.use_count())
+	{
+		throw std::invalid_argument("NULL arguments");
+	}
+
 	//	add to store
 	auto objectId {m_store.add(symbol)};
 
