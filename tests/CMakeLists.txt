@@ -2,9 +2,10 @@ set(BINARY ${CMAKE_PROJECT_NAME}_test)
 
 set(SOURCES
     testmain.cpp
-    CObjectStore_UnitTest.cpp
-    CObjectIndex_UnitTest.cpp
-    CClangSymbolsInMemoryDB_UnitTest.cpp
+    CObjectStore_UnitTests.cpp
+    CObjectIndex_UnitTests.cpp
+    CClangSymbolsInMemoryDB_UnitTests.cpp
+    CCamelCaseKeyGenerator_UnitTests.cpp
 )
 
 add_executable(${BINARY} ${SOURCES})

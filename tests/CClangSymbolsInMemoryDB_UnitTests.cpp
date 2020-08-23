@@ -30,13 +30,13 @@ std::vector<std::shared_ptr<CClangParser::CObjectInfo>> addDummyInMemoryDBEntrie
     return result;
 }
 
-TEST(CClangSymbolsInMemoryDB_UnitTest, Input_Validations)
+TEST(CClangSymbolsInMemoryDB_UnitTests, Input_Validations)
 {
     CClangSymbolsInMemoryDB store;
     ASSERT_THROW(store.add(std::shared_ptr<CClangParser::CObjectInfo>()), std::invalid_argument);
 }
 
-TEST(CClangSymbolsInMemoryDB_UnitTest, Simple_Search)
+TEST(CClangSymbolsInMemoryDB_UnitTests, Simple_Search)
 {
     auto dummyObjects {addDummyInMemoryDBEntries()};
     CClangSymbolsInMemoryDB store;
@@ -68,7 +68,7 @@ TEST(CClangSymbolsInMemoryDB_UnitTest, Simple_Search)
     ASSERT_TRUE(searchResults.empty());
 }
 
-TEST(CClangSymbolsInMemoryDB_UnitTest, Case_Sensitivity)
+TEST(CClangSymbolsInMemoryDB_UnitTests, Case_Sensitivity)
 {
     CClangSymbolsInMemoryDB store;
     store.add(

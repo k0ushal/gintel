@@ -13,7 +13,8 @@ set(SOURCES
 	CClangUtil.cpp
 	CObjectStore.cpp
 	CClangSymbolsInMemoryDB.cpp
-	CObjectIndex.cpp)
+	CObjectIndex.cpp
+	CCamelCaseKeyGenerator.cpp)
 
 add_executable(${BINARY} ${SOURCES})
 add_library(${BINARY}_lib STATIC ${SOURCES})
