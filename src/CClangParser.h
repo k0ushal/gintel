@@ -41,7 +41,7 @@ namespace gintel
 						{
 						}
 
-						bool operator ==(const CObjectInfo& right)
+						bool operator ==(const CObjectInfo& right) const
 						{
 							return (m_name == right.m_name &&
 									m_type == right.m_type &&

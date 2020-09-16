@@ -5,10 +5,13 @@
 #include <algorithm>
 #include "CClangParser.h"
 #include "CClangSymbolsInMemoryDB.h"
+#include "CCamelCaseKeyGenerator.h"
 #include "CObjectIndex.h"
+#include "util.h"
 
 using gintel::storage::CClangSymbolsInMemoryDB;
 using gintel::modules::CClangParser;
+using gintel::modules::CCamelCaseKeyGenerator;
 
 void CClangSymbolsInMemoryDB::add(std::shared_ptr<CClangParser::CObjectInfo> symbol)
 {
@@ -20,14 +23,23 @@ void CClangSymbolsInMemoryDB::add(std::shared_ptr<CClangParser::CObjectInfo> sym
 	//	add to store
 	auto objectId {m_store.add(symbol)};
 
-	//	[TODO] generate different keys for symbol here.
-	//	required for type-ahead suggestions
+	//	generate keys
+	auto keys {CCamelCaseKeyGenerator::createKeys(symbol->name())};
 
 	//	add to index
-	m_index.add(symbol->name(), objectId);
+	std::for_each(keys.begin(), keys.end(), [&, this](const std::string& key) {
+
+		if (key.length() >= 3)
+		{
+			m_index.add(
+				gintel::util::string::lowercase(key),
+				objectId);
+		}
+	});
 }
 
-std::vector<std::shared_ptr<CClangParser::CObjectInfo>> CClangSymbolsInMemoryDB::typeAheadSuggestions(
+std::vector<std::shared_ptr<CClangParser::CObjectInfo>>
+CClangSymbolsInMemoryDB::typeAheadSuggestions(
 	const std::string& keyword)
 {
 	auto resultIds {m_index.typeAheadSuggestions(keyword)};
@@ -49,7 +61,8 @@ std::vector<std::shared_ptr<CClangParser::CObjectInfo>> CClangSymbolsInMemoryDB:
 std::vector<std::shared_ptr<CClangParser::CObjectInfo>> CClangSymbolsInMemoryDB::search(
 	const std::string& keyword)
 {
-	auto resultIds {m_index.search(keyword)};
+	auto lowerKeyword {gintel::util::string::lowercase(keyword)};
+	auto resultIds {m_index.search(lowerKeyword)};
 
 	std::vector<std::shared_ptr<CClangParser::CObjectInfo>> result;
 	result.reserve(resultIds.size());

@@ -1,12 +1,18 @@
 
+#include <iostream>
 #include <regex>
 #include "CCamelCaseKeyGenerator.h"
 
 using gintel::modules::CCamelCaseKeyGenerator;
 
-std::vector<std::string> CCamelCaseKeyGenerator::createKeys(const std::string& input)
+std::vector<std::string> CCamelCaseKeyGenerator::createKeys(
+    const std::string& input
+    )
 {
-    std::regex rexpr {"((^[a-z]|[A-Z]*)[a-z]*)"};
+    if (input.empty())
+        return {};
+
+    std::regex rexpr ("([^a-zA-Z]*)((^[a-z]|[A-Z]*)[a-z]*)");
     std::smatch matches;
 
     std::vector<std::string> result;
@@ -14,13 +20,18 @@ std::vector<std::string> CCamelCaseKeyGenerator::createKeys(const std::string& i
 
     while (std::regex_search(inputStr, matches, rexpr))
     {
-        if (!matches.size())
+        if (matches.size() < 3)
             break;
 
-        std::string partialMatch {matches[0].str()};
+        std::string ignoredChars {matches[1].str()};
+        std::string partialMatch {matches[2].str()};
+
+        if (partialMatch.empty())
+            break;
+
         result.push_back(partialMatch);
 
-        inputStr = inputStr.substr(partialMatch.length());
+        inputStr = inputStr.substr(partialMatch.length() + ignoredChars.length());
         if (inputStr.empty())
             break;
     }

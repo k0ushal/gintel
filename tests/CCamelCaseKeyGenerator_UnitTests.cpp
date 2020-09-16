@@ -43,7 +43,7 @@ TEST(CCamelCaseKeyGenerator_UnitTests, Multiple_Uppercase_Followed_By_Lowercase)
     ASSERT_EQ(result[1], "York");
 }
 
-TEST(CCamelCaseKeyGenerator_UnitTests, Multiple_Lowecase_Followed_By_Uppercase)
+TEST(CCamelCaseKeyGenerator_UnitTests, Multiple_Lowercase_Followed_By_Uppercase)
 {
     std::string input{"thisIsAfunctionName"};
     auto result {CCamelCaseKeyGenerator::createKeys(input)};
@@ -55,7 +55,35 @@ TEST(CCamelCaseKeyGenerator_UnitTests, Multiple_Lowecase_Followed_By_Uppercase)
     ASSERT_EQ(result[3], "Name");
 }
 
-TEST(CCamelCaseKeyGenerator_UnitTests, Non_Alphabetic_Characters)
+TEST(CCamelCaseKeyGenerator_UnitTests, Non_Alphabetic_Characters_1)
 {
-    ASSERT_EQ(1, 1);
+    std::string input{"Shape::Draw"};
+    auto result {CCamelCaseKeyGenerator::createKeys(input)};
+
+    ASSERT_EQ(result.size(), 2);
+    ASSERT_EQ(result[0], "Shape");
+    ASSERT_EQ(result[1], "Draw");
+}
+
+TEST(CCamelCaseKeyGenerator_UnitTests, Non_Alphabetic_Characters_2)
+{
+    std::string input{"Shape_Draw"};
+    auto result {CCamelCaseKeyGenerator::createKeys(input)};
+
+    ASSERT_EQ(result.size(), 2);
+    ASSERT_EQ(result[0], "Shape");
+    ASSERT_EQ(result[1], "Draw");
+}
+
+TEST(CCamelCaseKeyGenerator_UnitTests, Non_Alphabetic_Characters_In_The_Beginning)
+{
+    std::string input{"_this_Is1A_Shape_Draw"};
+    auto result {CCamelCaseKeyGenerator::createKeys(input)};
+
+    ASSERT_EQ(result.size(), 5);
+    ASSERT_EQ(result[0], "this");
+    ASSERT_EQ(result[1], "Is");
+    ASSERT_EQ(result[2], "A");
+    ASSERT_EQ(result[3], "Shape");
+    ASSERT_EQ(result[4], "Draw");
 }
