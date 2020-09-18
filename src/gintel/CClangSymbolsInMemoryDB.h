@@ -5,24 +5,29 @@
 #include <vector>
 #include <string>
 #include <memory>
-#include "CClangParser.h"
-#include "CObjectStore.h"
 #include "CObjectIndex.h"
+#include "CObjectStore.h"
 
 namespace gintel
 {
 	namespace storage
 	{
+		class CObjectIndex;
+		class CObjectStore;
+		class CSymbolInfo;
+
 		class CClangSymbolsInMemoryDB
 		{
 			public:
-				void add(std::shared_ptr<gintel::modules::CClangParser::CObjectInfo> symbol);
-				std::vector<std::shared_ptr<gintel::modules::CClangParser::CObjectInfo>> search(const std::string& keyword);
-				std::vector<std::shared_ptr<gintel::modules::CClangParser::CObjectInfo>> typeAheadSuggestions(const std::string& keyword);
+				CClangSymbolsInMemoryDB();
+
+				void add(std::shared_ptr<gintel::storage::CSymbolInfo> symbol);
+				std::vector<std::shared_ptr<gintel::storage::CSymbolInfo>> search(const std::string& keyword);
+				std::vector<std::shared_ptr<gintel::storage::CSymbolInfo>> typeAheadSuggestions(const std::string& keyword);
 
 			private:
-				CObjectStore m_store;
-				CObjectIndex m_index;
+				std::unique_ptr<CObjectStore> m_store;
+				std::unique_ptr<CObjectIndex> m_index;
 		};
 	}
 }

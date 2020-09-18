@@ -13,7 +13,9 @@ set(SOURCES
 	CObjectStore.cpp
 	CClangSymbolsInMemoryDB.cpp
 	CObjectIndex.cpp
-	CCamelCaseKeyGenerator.cpp)
+	CCamelCaseKeyGenerator.cpp
+	CSymbolInfo.cpp
+	IGintelEngine.cpp)
 
 add_library(${LIBRARY} SHARED ${SOURCES})
 

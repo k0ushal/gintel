@@ -10,26 +10,27 @@ clang++ ex3.cpp $(llvm-config-10 --cxxflags) $(llvm-config-10 --ldflags --libs -
 #include <string>
 #include <sstream>
 #include <algorithm>
-#include "CGintelEngine.h"
-#include "CClangParser.h"
+#include "IGintelEngine.h"
+#include "CSymbolInfo.h"
 
-using gintel::modules::CGintelEngine;
+using gintel::modules::IGintelEngine;
 using gintel::modules::SourceProject;
-using gintel::modules::CClangParser;
+using gintel::storage::SymbolType;
+using gintel::storage::CSymbolInfo;
 using std::cout;
 using std::endl;
 
-std::string obNameFromType(CClangParser::ObjectType type)
+std::string obNameFromType(SymbolType type)
 {
 	switch (type)
 	{
-		case CClangParser::ObjectType::Method:
+		case SymbolType::Method:
 			return "[Method]";
 
-		case CClangParser::ObjectType::Class:
+		case SymbolType::Class:
 			return "[Class]";
 
-		case CClangParser::ObjectType::GlobalFunction:
+		case SymbolType::GlobalFunction:
 			return "[Function]";
 	}
 
@@ -38,10 +39,10 @@ std::string obNameFromType(CClangParser::ObjectType type)
 
 void print(
 	const std::filesystem::path& sourcePathPrefix,
-	const std::vector<std::shared_ptr<CClangParser::CObjectInfo>> &objects
+	const std::vector<std::shared_ptr<CSymbolInfo>> &objects
 	)
 {
-	std::for_each(objects.begin(), objects.end(), [&](const std::shared_ptr<CClangParser::CObjectInfo> object) {
+	std::for_each(objects.begin(), objects.end(), [&](const std::shared_ptr<CSymbolInfo> object) {
 		auto fullPath{object->m_location.file.string()};
 		auto pos{fullPath.find(sourcePathPrefix.string())};
 		fullPath = fullPath.erase(pos, sourcePathPrefix.string().length());
@@ -68,7 +69,7 @@ void printHelp()
 
 int main()
 {
-	CGintelEngine engine;
+	auto engine {IGintelEngine::getInstance()};
 	auto currentDir {std::filesystem::current_path()};
 	std::unordered_set<std::string> allowedArgs {"add", "search", "help", "exit"};
 
@@ -116,7 +117,7 @@ int main()
 			}
 
 			auto fpath {std::filesystem::canonical(args[2])};
-			engine.addProject(SourceProject{args[1], fpath});
+			engine->addProject(SourceProject{args[1], fpath});
 		}
 		else if (args[0] == "search")
 		{
@@ -127,7 +128,7 @@ int main()
 				continue;
 			}
 
-			auto result {engine.searchSymbol(args[1])};
+			auto result {engine->searchSymbol(args[1])};
 			auto sourcePathPrefix {std::filesystem::current_path() / "target_sources"};
 
 			print(sourcePathPrefix, result);

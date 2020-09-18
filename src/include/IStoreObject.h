@@ -12,9 +12,7 @@ namespace gintel
 		class IStoreObject
 		{
 			public:
-				virtual ~IStoreObject()
-				{ }
-
+				virtual ~IStoreObject() = default;
 				virtual std::string name() = 0;
 				virtual std::shared_ptr<IStoreObject> clone() = 0;
 		};

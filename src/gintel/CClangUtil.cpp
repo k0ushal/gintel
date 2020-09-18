@@ -5,7 +5,6 @@
 
 using gintel::modules::CClangUtil;
 
-
 std::string CClangUtil::getCursorName(CXCursor cursor)
 {
 	auto cursorName {clang_getCursorDisplayName(cursor)};

@@ -4,24 +4,27 @@
 #include "IStoreObject.h"
 #include "CObjectStore.h"
 #include "CClangParser.h"
+#include "CSymbolInfo.h"
 
 using gintel::storage::CObjectStore;
+using gintel::storage::CSymbolInfo;
 using gintel::storage::IStoreObject;
+using gintel::storage::SymbolType;
 using gintel::modules::CClangParser;
 
-std::vector<std::shared_ptr<CClangParser::CObjectInfo>> addDummyObjectStoreEntries()
+std::vector<std::shared_ptr<CSymbolInfo>> addDummyObjectStoreEntries()
 {
-    std::vector<std::shared_ptr<CClangParser::CObjectInfo>> result;
+    std::vector<std::shared_ptr<CSymbolInfo>> result;
 
-    auto createObject {[](const std::string& name, CClangParser::ObjectType type, const std::filesystem::path& filePath) {
-        return std::make_shared<CClangParser::CObjectInfo>("Shape", name, type, filePath);
+    auto createObject {[](const std::string& name, SymbolType type, const std::filesystem::path& filePath) {
+        return std::make_shared<CSymbolInfo>("Shape", name, type, filePath);
     }};
 
-    result.push_back(createObject("Shape", CClangParser::ObjectType::Class, "shape/Shape.h"));
-    result.push_back(createObject("Shape::Draw", CClangParser::ObjectType::Method, "shape/Shape.h"));
-    result.push_back(createObject("Shape::Size", CClangParser::ObjectType::Method, "shape/Shape.h"));
-    result.push_back(createObject("createShapeInstance", CClangParser::ObjectType::GlobalFunction, "shape/Shape.cpp"));
-    result.push_back(createObject("Rectangle", CClangParser::ObjectType::Class, "shape/Rectangle.h"));
+    result.push_back(createObject("Shape", SymbolType::Class, "shape/Shape.h"));
+    result.push_back(createObject("Shape::Draw", SymbolType::Method, "shape/Shape.h"));
+    result.push_back(createObject("Shape::Size", SymbolType::Method, "shape/Shape.h"));
+    result.push_back(createObject("createShapeInstance", SymbolType::GlobalFunction, "shape/Shape.cpp"));
+    result.push_back(createObject("Rectangle", SymbolType::Class, "shape/Rectangle.h"));
 
     return result;
 }
@@ -52,7 +55,7 @@ TEST(CObjectStore_UnitTest, Basic_Add_and_Fetch_Test)
         auto object {obStore.get(objectId)};
 
         auto left {entries[index].get()};
-        auto right {std::dynamic_pointer_cast<CClangParser::CObjectInfo>(object).get()};
+        auto right {std::dynamic_pointer_cast<CSymbolInfo>(object).get()};
 
         ASSERT_TRUE(*left == *right);
 

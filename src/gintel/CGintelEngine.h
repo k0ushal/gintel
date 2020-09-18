@@ -5,39 +5,47 @@
 #include <filesystem>
 #include <vector>
 #include <string>
+#include <memory>
 #include <map>
-#include "CClangParser.h"
 #include "CClangSymbolsInMemoryDB.h"
-#include "GintelDataStruct.h"
+#include "IGintelEngine.h"
 
 namespace gintel
 {
+	namespace storage
+	{
+		class CSymbolInfo;
+		class CClangSymbolsInMemoryDB;
+	}
+
 	namespace modules
 	{
-		class CGintelEngine
+		class CGintelEngine : public IGintelEngine
 		{
 			public:
-				void addProject(const SourceProject& project);
-				void rebuildSymbolsDB();
-				std::vector<std::shared_ptr<CClangParser::CObjectInfo>> searchSymbol(
-					const std::string& keyword);
+				virtual void addProject(const SourceProject& project) override;
+				virtual void rebuildSymbolsDB() override;
+				virtual std::vector<std::shared_ptr<gintel::storage::CSymbolInfo>> searchSymbol(
+					const std::string& keyword) override;
 
 			private:
 				void processProject(const SourceProject& project);
 				void addSymbolToDB(
-					std::shared_ptr<CClangParser::CObjectInfo> objInfo,
+					std::shared_ptr<gintel::storage::CSymbolInfo> objInfo,
 					const SourceProject& project);
 				
 			public:
-				CGintelEngine() = default;
+				CGintelEngine();
 				~CGintelEngine() = default;
 				CGintelEngine(const CGintelEngine&) = delete;
 				CGintelEngine& operator =(const CGintelEngine&) = delete;
 
 			private:
 				static std::vector<std::string> SOURCE_FILE_EXTENSIONS;
+
+			private:
 				std::map<std::string, SourceProject> m_projectsList;
-				gintel::storage::CClangSymbolsInMemoryDB m_symbolsDB;
+				std::unique_ptr<gintel::storage::CClangSymbolsInMemoryDB> m_symbolsDB;
 		};
 	}
 }

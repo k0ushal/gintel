@@ -12,16 +12,18 @@ clang++ ex3.cpp $(llvm-config-10 --cxxflags) $(llvm-config-10 --ldflags --libs -
 #include <filesystem>
 #include "CClangParser.h"
 #include "CClangUtil.h"
-#include "GintelDataStruct.h"
+#include "CSymbolInfo.h"
+#include "IGintelEngine.h"
 
 using gintel::modules::CClangParser;
 using gintel::modules::CClangUtil;
 using gintel::modules::SourceProject;
-using gintel::storage::IStoreObject;
+using gintel::storage::CSymbolInfo;
+using gintel::storage::SymbolType;
 
 struct VisitorContext
 {
-	std::function<bool(std::shared_ptr<CClangParser::CObjectInfo>, void*)> callback;
+	std::function<bool(std::shared_ptr<CSymbolInfo>, void*)> callback;
 	void* callbackCtx;
 };
 
@@ -41,15 +43,15 @@ CXChildVisitResult visitor(
 	}
 
 	//	cursor kind mapping
-	std::map<CXCursorKind, CClangParser::ObjectType> cursorKindMap;
-	cursorKindMap[CXCursorKind::CXCursor_FunctionDecl] = CClangParser::ObjectType::GlobalFunction;
-	cursorKindMap[CXCursorKind::CXCursor_ClassDecl] = CClangParser::ObjectType::Class;
-	cursorKindMap[CXCursorKind::CXCursor_CXXMethod] = CClangParser::ObjectType::Method;
+	std::map<CXCursorKind, SymbolType> cursorKindMap;
+	cursorKindMap[CXCursorKind::CXCursor_FunctionDecl] = SymbolType::GlobalFunction;
+	cursorKindMap[CXCursorKind::CXCursor_ClassDecl] = SymbolType::Class;
+	cursorKindMap[CXCursorKind::CXCursor_CXXMethod] = SymbolType::Method;
 
 	CXCursorKind kind {clang_getCursorKind(cursor)};
 
 	//	Object info generation
-	auto prepareObject {[&](CXCursor cur, CXCursor parent) -> std::shared_ptr<CClangParser::CObjectInfo> {
+	auto prepareObject {[&](CXCursor cur, CXCursor parent) -> std::shared_ptr<CSymbolInfo> {
 
 		std::string curName;
 		if (kind == CXCursorKind::CXCursor_CXXMethod)
@@ -60,7 +62,7 @@ CXChildVisitResult visitor(
 		auto curKind {cursorKindMap[kind]};
 		auto filePath {CClangUtil::getCursorFileLocation(cur)};
 
-		return std::make_shared<CClangParser::CObjectInfo>(sourceProject->projectName, curName, curKind, filePath);
+		return std::make_shared<CSymbolInfo>(sourceProject->projectName, curName, curKind, filePath);
 	}};
 
 	//	Only indicate objects of interest to the caller
@@ -81,7 +83,7 @@ CXChildVisitResult visitor(
 
 void CClangParser::parseSourceFile(
 	const std::filesystem::path& filePath,
-	std::function<bool(std::shared_ptr<CClangParser::CObjectInfo>, void*)> callback,
+	std::function<bool(std::shared_ptr<CSymbolInfo>, void*)> callback,
 	void* context
 	)
 {

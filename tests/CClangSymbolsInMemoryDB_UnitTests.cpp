@@ -1,31 +1,32 @@
 #include <vector>
 #include <memory>
 #include "gtest/gtest.h"
-#include "CClangParser.h"
 #include "IStoreObject.h"
 #include "CClangSymbolsInMemoryDB.h"
+#include "CSymbolInfo.h"
 
+using gintel::storage::CSymbolInfo;
 using gintel::storage::IStoreObject;
-using gintel::modules::CClangParser;
+using gintel::storage::SymbolType;
 using gintel::storage::CClangSymbolsInMemoryDB;
 
-std::vector<std::shared_ptr<CClangParser::CObjectInfo>> createDummyInMemoryDBEntries()
+std::vector<std::shared_ptr<CSymbolInfo>> createDummyInMemoryDBEntries()
 {
-    std::vector<std::shared_ptr<CClangParser::CObjectInfo>> result;
+    std::vector<std::shared_ptr<CSymbolInfo>> result;
 
     auto createObject {[](
         const std::string& name,
-        CClangParser::ObjectType type,
+        SymbolType type,
         const std::filesystem::path& filePath) {
 
-        return std::make_shared<CClangParser::CObjectInfo>(
+        return std::make_shared<CSymbolInfo>(
                 "Shape", name, type, filePath);
     }};
 
-    result.push_back(createObject("Shape", CClangParser::ObjectType::Class, "shape/Shape.h"));
-    result.push_back(createObject("Shape::Size", CClangParser::ObjectType::Method, "shape/Shape.h"));
-    result.push_back(createObject("createShapeInstance", CClangParser::ObjectType::GlobalFunction, "shape/Shape.cpp"));
-    result.push_back(createObject("Rectangle", CClangParser::ObjectType::Class, "shape/Rectangle.h"));
+    result.push_back(createObject("Shape", SymbolType::Class, "shape/Shape.h"));
+    result.push_back(createObject("Shape::Size", SymbolType::Method, "shape/Shape.h"));
+    result.push_back(createObject("createShapeInstance", SymbolType::GlobalFunction, "shape/Shape.cpp"));
+    result.push_back(createObject("Rectangle", SymbolType::Class, "shape/Rectangle.h"));
 
     return result;
 }
@@ -33,7 +34,7 @@ std::vector<std::shared_ptr<CClangParser::CObjectInfo>> createDummyInMemoryDBEnt
 TEST(CClangSymbolsInMemoryDB_UnitTests, Input_Validations)
 {
     CClangSymbolsInMemoryDB store;
-    ASSERT_THROW(store.add(std::shared_ptr<CClangParser::CObjectInfo>()), std::invalid_argument);
+    ASSERT_THROW(store.add(std::shared_ptr<CSymbolInfo>()), std::invalid_argument);
 }
 
 TEST(CClangSymbolsInMemoryDB_UnitTests, Simple_Search)
@@ -42,7 +43,7 @@ TEST(CClangSymbolsInMemoryDB_UnitTests, Simple_Search)
     CClangSymbolsInMemoryDB store;
 
     std::for_each(dummyObjects.begin(), dummyObjects.end(),
-        [&](std::shared_ptr<CClangParser::CObjectInfo> object) {
+        [&](std::shared_ptr<CSymbolInfo> object) {
             store.add(object);
         });
 
@@ -57,7 +58,7 @@ TEST(CClangSymbolsInMemoryDB_UnitTests, Multiple_Keys)
     CClangSymbolsInMemoryDB store;
 
     std::for_each(dummyObjects.begin(), dummyObjects.end(),
-        [&](std::shared_ptr<CClangParser::CObjectInfo> object) {
+        [&](std::shared_ptr<CSymbolInfo> object) {
             store.add(object);
         });
 
@@ -67,18 +68,18 @@ TEST(CClangSymbolsInMemoryDB_UnitTests, Multiple_Keys)
 
     ASSERT_EQ(
         *searchResults[0],
-        CClangParser::CObjectInfo(
-            "Shape", "Shape", CClangParser::ObjectType::Class, "shape/Shape.h"));
+        CSymbolInfo(
+            "Shape", "Shape", SymbolType::Class, "shape/Shape.h"));
 
     ASSERT_EQ(
         *searchResults[1],
-        CClangParser::CObjectInfo(
-            "Shape", "Shape::Size", CClangParser::ObjectType::Method, "shape/Shape.h"));
+        CSymbolInfo(
+            "Shape", "Shape::Size", SymbolType::Method, "shape/Shape.h"));
 
     ASSERT_EQ(
         *searchResults[2],
-        CClangParser::CObjectInfo(
-            "Shape", "createShapeInstance", CClangParser::ObjectType::GlobalFunction, "shape/Shape.cpp"));
+        CSymbolInfo(
+            "Shape", "createShapeInstance", SymbolType::GlobalFunction, "shape/Shape.cpp"));
 
     //  createShapeInstance
     searchResults = store.search("create");
@@ -86,25 +87,25 @@ TEST(CClangSymbolsInMemoryDB_UnitTests, Multiple_Keys)
 
     ASSERT_EQ(
         *searchResults[0],
-        CClangParser::CObjectInfo(
-            "Shape", "createShapeInstance", CClangParser::ObjectType::GlobalFunction, "shape/Shape.cpp"));
+        CSymbolInfo(
+            "Shape", "createShapeInstance", SymbolType::GlobalFunction, "shape/Shape.cpp"));
 }
 
 TEST(CClangSymbolsInMemoryDB_UnitTests, Case_Sensitivity)
 {
     CClangSymbolsInMemoryDB store;
     store.add(
-        std::make_shared<CClangParser::CObjectInfo>(
-            "Shape", "Shape", CClangParser::ObjectType::Class, "testfile"));
+        std::make_shared<CSymbolInfo>(
+            "Shape", "Shape", SymbolType::Class, "testfile"));
 
     auto searchResults {store.search("shape")};
     ASSERT_EQ(searchResults.size(), 1);
-    ASSERT_EQ(*searchResults[0], CClangParser::CObjectInfo(
-            "Shape", "Shape", CClangParser::ObjectType::Class, "testfile"));
+    ASSERT_EQ(*searchResults[0], CSymbolInfo(
+            "Shape", "Shape", SymbolType::Class, "testfile"));
 
     store.add(
-        std::make_shared<CClangParser::CObjectInfo>(
-            "Shape", "createShapeInstance", CClangParser::ObjectType::GlobalFunction, "shapeFile.cpp"));
+        std::make_shared<CSymbolInfo>(
+            "Shape", "createShapeInstance", SymbolType::GlobalFunction, "shapeFile.cpp"));
 
     auto results {store.search("Shape")};
     ASSERT_EQ(results.size(), 2);

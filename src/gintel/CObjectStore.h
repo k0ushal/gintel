@@ -5,13 +5,13 @@
 #include <list>
 #include <memory>
 #include <any>
-#include "IStoreObject.h"
-
 
 namespace gintel
 {
 	namespace storage
 	{
+		class IStoreObject;
+
 		class CObjectStore
 		{
 			public:
