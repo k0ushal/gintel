@@ -15,7 +15,7 @@ set(SOURCES
 	CObjectIndex.cpp
 	CCamelCaseKeyGenerator.cpp)
 
-add_library(${LIBRARY} STATIC ${SOURCES})
+add_library(${LIBRARY} SHARED ${SOURCES})
 
 find_library(CLANG_LIB NAME clang)
 target_link_libraries(${LIBRARY} PUBLIC ${CLANG_LIB})

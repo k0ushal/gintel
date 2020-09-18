@@ -54,7 +54,7 @@ void print(
 void printHelp()
 {
 	cout << endl << endl;
-	cout << "Commands:" << endl;
+	cout << "Usage:" << endl;
 
 	cout << "    add <project-name> <source-dir-path>" << endl;
 	cout << "    Adds a project to the database and builds an index over it" << endl << endl;

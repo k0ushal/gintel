@@ -14,7 +14,7 @@ std::vector<std::shared_ptr<CClangParser::CObjectInfo>> addDummyObjectStoreEntri
     std::vector<std::shared_ptr<CClangParser::CObjectInfo>> result;
 
     auto createObject {[](const std::string& name, CClangParser::ObjectType type, const std::filesystem::path& filePath) {
-        return std::make_shared<CClangParser::CObjectInfo>(name, type, filePath);
+        return std::make_shared<CClangParser::CObjectInfo>("Shape", name, type, filePath);
     }};
 
     result.push_back(createObject("Shape", CClangParser::ObjectType::Class, "shape/Shape.h"));
