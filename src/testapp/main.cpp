@@ -46,7 +46,7 @@ void print(
 		auto pos{fullPath.find(sourcePathPrefix.string())};
 		fullPath = fullPath.erase(pos, sourcePathPrefix.string().length());
 
-		cout << obNameFromType(object->m_type) << " " << object->m_name
+		cout << object->m_project << ": " << obNameFromType(object->m_type) << " " << object->m_name
 			 << ", [" << fullPath << "]" << endl;
 	});
 }
@@ -106,6 +106,12 @@ int main()
 			{
 				cout << "Missing args for [add] command" << endl;
 				printHelp();
+				continue;
+			}
+
+			if (!std::filesystem::exists(args[2]) || !std::filesystem::is_directory(args[2]))
+			{
+				cout << "Error:: Please check that the <source-dir-path> exists and points to a directory" << endl;
 				continue;
 			}
 

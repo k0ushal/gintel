@@ -19,7 +19,7 @@ std::vector<std::shared_ptr<CClangParser::CObjectInfo>> createDummyInMemoryDBEnt
         const std::filesystem::path& filePath) {
 
         return std::make_shared<CClangParser::CObjectInfo>(
-                name, type, filePath);
+                "Shape", name, type, filePath);
     }};
 
     result.push_back(createObject("Shape", CClangParser::ObjectType::Class, "shape/Shape.h"));
@@ -68,17 +68,17 @@ TEST(CClangSymbolsInMemoryDB_UnitTests, Multiple_Keys)
     ASSERT_EQ(
         *searchResults[0],
         CClangParser::CObjectInfo(
-            "Shape", CClangParser::ObjectType::Class, "shape/Shape.h"));
+            "Shape", "Shape", CClangParser::ObjectType::Class, "shape/Shape.h"));
 
     ASSERT_EQ(
         *searchResults[1],
         CClangParser::CObjectInfo(
-            "Shape::Size", CClangParser::ObjectType::Method, "shape/Shape.h"));
+            "Shape", "Shape::Size", CClangParser::ObjectType::Method, "shape/Shape.h"));
 
     ASSERT_EQ(
         *searchResults[2],
         CClangParser::CObjectInfo(
-            "createShapeInstance", CClangParser::ObjectType::GlobalFunction, "shape/Shape.cpp"));
+            "Shape", "createShapeInstance", CClangParser::ObjectType::GlobalFunction, "shape/Shape.cpp"));
 
     //  createShapeInstance
     searchResults = store.search("create");
@@ -87,7 +87,7 @@ TEST(CClangSymbolsInMemoryDB_UnitTests, Multiple_Keys)
     ASSERT_EQ(
         *searchResults[0],
         CClangParser::CObjectInfo(
-            "createShapeInstance", CClangParser::ObjectType::GlobalFunction, "shape/Shape.cpp"));
+            "Shape", "createShapeInstance", CClangParser::ObjectType::GlobalFunction, "shape/Shape.cpp"));
 }
 
 TEST(CClangSymbolsInMemoryDB_UnitTests, Case_Sensitivity)
@@ -95,16 +95,16 @@ TEST(CClangSymbolsInMemoryDB_UnitTests, Case_Sensitivity)
     CClangSymbolsInMemoryDB store;
     store.add(
         std::make_shared<CClangParser::CObjectInfo>(
-            "Shape", CClangParser::ObjectType::Class, "testfile"));
+            "Shape", "Shape", CClangParser::ObjectType::Class, "testfile"));
 
     auto searchResults {store.search("shape")};
     ASSERT_EQ(searchResults.size(), 1);
     ASSERT_EQ(*searchResults[0], CClangParser::CObjectInfo(
-            "Shape", CClangParser::ObjectType::Class, "testfile"));
+            "Shape", "Shape", CClangParser::ObjectType::Class, "testfile"));
 
     store.add(
         std::make_shared<CClangParser::CObjectInfo>(
-            "createShapeInstance", CClangParser::ObjectType::GlobalFunction, "shapeFile.cpp"));
+            "Shape", "createShapeInstance", CClangParser::ObjectType::GlobalFunction, "shapeFile.cpp"));
 
     auto results {store.search("Shape")};
     ASSERT_EQ(results.size(), 2);

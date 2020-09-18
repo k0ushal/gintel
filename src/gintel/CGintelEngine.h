@@ -8,17 +8,12 @@
 #include <map>
 #include "CClangParser.h"
 #include "CClangSymbolsInMemoryDB.h"
+#include "GintelDataStruct.h"
 
 namespace gintel
 {
 	namespace modules
 	{
-		struct SourceProject
-		{
-			std::string projectName;
-			std::filesystem::path srcDirPath;
-		};
-
 		class CGintelEngine
 		{
 			public:

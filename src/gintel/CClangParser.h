@@ -32,9 +32,11 @@ namespace gintel
 					public:
 						CObjectInfo() = default;
 						CObjectInfo(
+							const std::string& projectName,
 							const std::string& name,
 							CClangParser::ObjectType type,
 							const std::filesystem::path filePath) :
+							m_project(projectName),
 							m_name{name},
 							m_type{type},
 							m_location{filePath}
@@ -43,7 +45,8 @@ namespace gintel
 
 						bool operator ==(const CObjectInfo& right) const
 						{
-							return (m_name == right.m_name &&
+							return (m_project == right.m_project &&
+									m_name == right.m_name &&
 									m_type == right.m_type &&
 									m_location.file == right.m_location.file);
 						}
@@ -53,6 +56,7 @@ namespace gintel
 						virtual std::shared_ptr<gintel::storage::IStoreObject> clone() override
 						{
 							auto obCopy {std::make_shared<CObjectInfo>()};
+							obCopy->m_project = this->m_project;
 							obCopy->m_name = this->m_name;
 							obCopy->m_type = this->m_type;
 							obCopy->m_location = this->m_location;
