@@ -42,6 +42,7 @@ void CGintelEngine::processProject(
 void CGintelEngine::addProject(const SourceProject& project)
 {
 	m_projectsList.emplace(project.projectName, project);
+	processProject(project);
 }
 
 void CGintelEngine::rebuildSymbolsDB()

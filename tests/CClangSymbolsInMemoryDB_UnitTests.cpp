@@ -104,10 +104,10 @@ TEST(CClangSymbolsInMemoryDB_UnitTests, Case_Sensitivity)
 
     store.add(
         std::make_shared<CClangParser::CObjectInfo>(
-            "shape", CClangParser::ObjectType::GlobalFunction, "shapeFile.cpp"));
+            "createShapeInstance", CClangParser::ObjectType::GlobalFunction, "shapeFile.cpp"));
 
     auto results {store.search("Shape")};
     ASSERT_EQ(results.size(), 2);
     ASSERT_EQ(results[0]->m_location.file, "testfile");
-    ASSERT_EQ(results[1]->m_location.file, "shapeFile.cpp");
+    ASSERT_EQ(results[1]->m_name, "createShapeInstance");
 }

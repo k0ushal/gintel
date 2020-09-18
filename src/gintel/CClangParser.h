@@ -66,6 +66,7 @@ namespace gintel
 						}
 
 					public:
+						std::string m_project;
 						std::string m_name;
 						ObjectType m_type;
 						ObjectLocationInfo m_location;

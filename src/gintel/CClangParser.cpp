@@ -30,6 +30,7 @@ CXChildVisitResult visitor(
 	)
 {
 	auto visitorCtx {reinterpret_cast<VisitorContext*>(context)};
+	// auto sourceProject {reinterpret_cast<SourceProject*>(visitorCtx->callbackCtx)};
 
 	auto isMainFile = clang_Location_isFromMainFile(clang_getCursorLocation(cursor));
 	if (!isMainFile)
