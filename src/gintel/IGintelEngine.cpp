@@ -17,3 +17,17 @@ std::shared_ptr<IGintelEngine> IGintelEngine::getInstance()
     g_gintelInstance = std::dynamic_pointer_cast<IGintelEngine>(instance);
     return g_gintelInstance;
 }
+
+//  C style exports for dynamically linked apps
+gintel::modules::IGintelEngine* createGintelInstance()
+{
+    return new CGintelEngine();
+}
+
+void destroyGintelInstance(gintel::modules::IGintelEngine* pInstance)
+{
+    if (!pInstance)
+        return;
+
+    delete pInstance;
+}

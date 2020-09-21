@@ -2,7 +2,6 @@
 #define _CSYMBOL_INFO_H_
 
 #include <string>
-#include <filesystem>
 #include "IStoreObject.h"
 
 namespace gintel
@@ -18,7 +17,7 @@ namespace gintel
 
         struct SymbolLocationInfo
         {
-            std::filesystem::path file;
+            std::string file;
         };
 
         class CSymbolInfo : public IStoreObject
@@ -29,7 +28,7 @@ namespace gintel
                     const std::string& projectName,
                     const std::string& name,
                     SymbolType type,
-                    const std::filesystem::path filePath
+                    const std::string& filePath
                     );
 
             public:

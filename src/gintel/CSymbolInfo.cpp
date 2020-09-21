@@ -9,7 +9,7 @@ CSymbolInfo::CSymbolInfo(
     const std::string& projectName,
     const std::string& name,
     SymbolType type,
-    const std::filesystem::path filePath
+    const std::string& filePath
     ) : m_project{projectName}, m_name{name},
         m_type{type}, m_location{filePath}
 {

@@ -3,21 +3,16 @@
 
 #include <vector>
 #include <string>
-#include <filesystem>
+#include "CSymbolInfo.h"
 
 namespace gintel
 {
-    namespace storage
-    {
-        class CSymbolInfo;
-    }
-
     namespace modules
     { 
         struct SourceProject
         {
             std::string projectName;
-            std::filesystem::path srcDirPath;
+            std::string srcDirPath;
         };
         
         class IGintelEngine
@@ -34,5 +29,23 @@ namespace gintel
         };
     }
 }
+
+/*************************************************
+ * E X P O R T S
+ ************************************************/
+
+extern "C"
+{
+    gintel::modules::IGintelEngine* createGintelInstance();
+    void destroyGintelInstance(gintel::modules::IGintelEngine*);
+}
+
+/*************************************************
+ * T Y P E D E F S
+ ************************************************/
+
+typedef gintel::modules::IGintelEngine* (*pfn_createGintelInstance)();
+typedef void (*pfn_destroyGintelInstance)(gintel::modules::IGintelEngine*);
+
 
 #endif  //  _IGINTEL_ENGINE_H_

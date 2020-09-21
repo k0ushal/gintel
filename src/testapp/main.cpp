@@ -6,6 +6,7 @@ clang++ ex3.cpp $(llvm-config-10 --cxxflags) $(llvm-config-10 --ldflags --libs -
 */
 
 #include <unordered_set>
+#include <filesystem>
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -43,7 +44,7 @@ void print(
 	)
 {
 	std::for_each(objects.begin(), objects.end(), [&](const std::shared_ptr<CSymbolInfo> object) {
-		auto fullPath{object->m_location.file.string()};
+		auto fullPath{object->m_location.file};
 		auto pos{fullPath.find(sourcePathPrefix.string())};
 		fullPath = fullPath.erase(pos, sourcePathPrefix.string().length());
 
@@ -117,7 +118,7 @@ int main()
 			}
 
 			auto fpath {std::filesystem::canonical(args[2])};
-			engine->addProject(SourceProject{args[1], fpath});
+			engine->addProject(SourceProject{args[1], fpath.string()});
 		}
 		else if (args[0] == "search")
 		{

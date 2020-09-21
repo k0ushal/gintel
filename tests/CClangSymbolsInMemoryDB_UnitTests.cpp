@@ -1,5 +1,6 @@
 #include <vector>
 #include <memory>
+#include <filesystem>
 #include "gtest/gtest.h"
 #include "IStoreObject.h"
 #include "CClangSymbolsInMemoryDB.h"
